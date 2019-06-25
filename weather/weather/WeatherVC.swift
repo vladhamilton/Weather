@@ -17,10 +17,28 @@ class WeatherVC: UIViewController {
   @IBOutlet weak var currentWeatherTypeLabel: UILabel!
   @IBOutlet weak var tableview: UITableView!
   
+  var currentWeather = CurrentWeather()
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    
+    tableview.delegate = self
+    tableview.dataSource = self
+    currentWeather.downloadWeatherDetails {
+      
+    }
   }
 }
 
+extension WeatherVC: UITableViewDelegate, UITableViewDataSource {
+  
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    return 6
+  }
+  
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let cell = tableView.dequeueReusableCell(withIdentifier: "weatherCell", for: indexPath)
+    
+    return cell
+  }
+}
