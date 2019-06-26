@@ -28,7 +28,6 @@ class WeatherVC: UIViewController {
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    //locationManager.startMonitoringSignificantLocationChanges()
     
     tableView.delegate = self
     tableView.dataSource = self
@@ -36,14 +35,9 @@ class WeatherVC: UIViewController {
     currentWeather = CurrentWeather()
     setupLocationManager()
   }
-  
-  override func viewDidAppear(_ animated: Bool) {
-    super.viewDidAppear(animated)
-    locationAuthStatus()
-  }
 }
 
-extension WeatherVC: UITableViewDelegate, UITableViewDataSource, CLLocationManagerDelegate {
+extension WeatherVC: UITableViewDelegate, UITableViewDataSource {
   
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return forecasts.count
@@ -62,13 +56,14 @@ extension WeatherVC: UITableViewDelegate, UITableViewDataSource, CLLocationManag
   
   func updateMainUI() {
     dateLabel.text = currentWeather.date
-    currentTempLabel.text = String(currentWeather.currentTemp)
+    currentTempLabel.text = String(currentWeather.currentTemp) + "°"
     currentWeatherTypeLabel.text = currentWeather.weatherType
     locationLabel.text = currentWeather.cityName
     currentWeatherImage.image = UIImage(named: currentWeather.weatherType)
   }
   
-  //MARK: Downloading forecast weather data for TableView
+  //MARK: -Downloading forecast weather data for TableView
+  
   func downloadForecastData(completed: @escaping DownloadComplete) {
     
     Alamofire.request(FORECAST_URL).responseJSON { response in
@@ -90,26 +85,12 @@ extension WeatherVC: UITableViewDelegate, UITableViewDataSource, CLLocationManag
       completed()
     }
   }
+}
+
+extension WeatherVC: CLLocationManagerDelegate {
   
-//  func locationManager(_ manager: CLLocationManager, didFailWithError error: Swift.Error) {
-//    print("error:: \(error.localizedDescription)")
-//  }
-//
-//  func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-//    if status == .authorizedWhenInUse {
-//      locationManager.requestLocation()
-//    }
-//  }
-//
-//  func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-//
-//    if locations.first != nil {
-//      print("location:: (location)")
-//    }
-//  }
-  
-  func locationAuthStatus() {
-    if CLLocationManager.authorizationStatus() == .authorizedWhenInUse {
+  func locationInUseStatus() {
+    //if CLLocationManager.authorizationStatus() == .authorizedWhenInUse {
       currentLocation = locationManager.location
       Location.sharedInstance.latitude = currentLocation.coordinate.latitude
       Location.sharedInstance.longitude = currentLocation.coordinate.longitude
@@ -118,9 +99,30 @@ extension WeatherVC: UITableViewDelegate, UITableViewDataSource, CLLocationManag
           self.updateMainUI()
         }
       }
-    } else {
+    //} else {
+      //locationManager.requestWhenInUseAuthorization()
+      //locationAuthStatus()
+    }
+  
+  func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+    switch status {
+    case .restricted, .denied:
+      let alert = UIAlertController(title: "Location Services disabled", message: "Please enable Location Services in Settings", preferredStyle: .alert)
+      let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+      alert.addAction(okAction)
+      
+      present(alert, animated: true, completion: nil)
+      return
+    case .authorizedWhenInUse:
+      locationInUseStatus()
+      break
+    case .notDetermined:
       locationManager.requestWhenInUseAuthorization()
-      locationAuthStatus()
+      break
+    case .authorizedAlways:
+      break
+    @unknown default:
+      print(Error.self)
     }
   }
   
@@ -131,6 +133,7 @@ extension WeatherVC: UITableViewDelegate, UITableViewDataSource, CLLocationManag
 
 
 //MARK: - Localiton Setup
+
 extension WeatherVC {
   
   func setupLocationManager() {

@@ -79,11 +79,3 @@ class Forecast {
     }
   }
 }
-
-extension Date {
-  func dayOfTheWeek() -> String {
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "EEEE"
-    return dateFormatter.string(from: self)
-  }
-}
