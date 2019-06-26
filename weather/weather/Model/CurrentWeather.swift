@@ -14,7 +14,7 @@ class CurrentWeather {
   var _cityName: String!
   var _date: String!
   var _weatherType: String!
-  var _currentTemp: Double!
+  var _currentTemp: Int!
   
   var cityName: String {
     if _cityName  == nil {
@@ -44,9 +44,9 @@ class CurrentWeather {
     return _weatherType
   }
   
-  var currentTemp: Double {
+  var currentTemp: Int {
     if _currentTemp == nil {
-      _currentTemp = 0.0
+      _currentTemp = 0
     }
     return _currentTemp
   }
@@ -70,7 +70,7 @@ class CurrentWeather {
         
         if let main = dict["main"] as? Dictionary<String, AnyObject> {
           if let currentTemperature = main["temp"] as? Double {
-            let kelvinToCelsius = Double(round(currentTemperature - 273.15))
+            let kelvinToCelsius = Int(round(currentTemperature - 273.15))
             self._currentTemp = kelvinToCelsius
           }
         }
