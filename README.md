@@ -25,7 +25,7 @@ Clone or download project from github. Open weather.xcworkspace and run it on yo
 
 ## Demo
 
-![](https://github.com/vladhamilton/Weather/tree/master/demo.gif)
+![demo](demo.gif)
 
 ## About
 
